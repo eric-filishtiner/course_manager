@@ -51,6 +51,16 @@
                 {% endfor %}
             </div>
             <!-- Task: show questions and choices -->
+            <div class="card-columns-vertical">
+                <h2>Questions and answers</h2>
+                {% for question in questions %}
+                <ul>
+                    {% for choice in question.choice_set.all %}
+                    <li>{{ choice.content }}</li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+            </div>
             <!-- <HINT> Use Bootstrap Collapse to hide exam first, more details could be found here
             https://www.w3schools.com/bootstrap4/bootstrap_collapse.asp-->
 

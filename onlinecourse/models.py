@@ -66,6 +66,13 @@ class Course(models.Model):
     def __str__(self):
         return "Name: " + self.name + "," + \
                "Description: " + self.description
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course = self.object
+        context['questions'] = course.questions.all()
+        context['choices'] = course.choices.all()
+        return context
 
 
 # Lesson model
@@ -109,7 +116,8 @@ class Question(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     grade_point = models.FloatField(null=False, default=0.0)
     content = models.TextField()
-    # <HINT> A sample model method to calculate if learner get the score of the question
+    # <HINT> A sample model method to calculate 
+    # if learner get the score of the question
     #def is_get_score(self, selected_ids):
     #    all_answers = self.choice_set.filter(is_correct=True).count()
     #    selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
