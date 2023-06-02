@@ -78,7 +78,10 @@
                     </div>
                 </div>
             -->
-            <button class="collapse-btn" onClick="showExam()">Start Exam</button>
+            <!-- 
+                <input class="btn btn-success btn-block" type="submit" value="Submit">
+            -->
+            <button class="collapse-btn btn btn-block" onClick="showExam()" style="color: white; background-color: #32A3B8">Start Exam</button>
                 <form id="questionform" action="point to a submit view" method="post">
                     <div class="exam-div" id="ex-div" style="display:none">
                         {% for question in questions %}
