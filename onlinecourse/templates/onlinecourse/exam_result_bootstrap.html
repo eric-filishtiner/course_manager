@@ -39,16 +39,42 @@
     {% if grade > 80 %}
     <div class="alert alert-success">
        <!--HINT Display passed info -->
+       <p>Congratulations, you have passed with a score of {{ grade }}</p> 
+       <p>{{submission}}
     </div>
         {% else %}
         <div class="alert alert-danger">
             <!--HINT Display failed info -->
+            <p>Sorry! You have failed exam with score {{ score }}</p>
+            <p>Write {{submission}} 
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
             <!--HINT Display exam results-->
+            <form id="questionform" action="submit/" method="post">
+                <div class="exam-div" id="ex-div" >
+                    {% for question in questions %}
+                    <div class="card mt-1">
+                        <div class="card-header"><h5>{{ question.content}}</h5></div>
+                        {% csrf_token %}
+                            <div class="form-group">
+                                {% for choice in question.choice_set.all %}
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" name="choice_{{choice.id}}"
+                                            class="form-check-input" id="{{choice.id}}"
+                                            value="{{choice.id}}">{{ choice.content }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                <input class="btn btn-success btn-block" type="submit" value="Submit">
+            </form>
         </div>
     </div>
 </body>
