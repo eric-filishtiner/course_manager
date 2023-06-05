@@ -82,38 +82,47 @@ def show_exam_result(request, course_id, submission_id):
     # Get course and submission based on their ids
     course = get_object_or_404(Course, pk=course_id)
     submission=Submission.objects.get(id=submission_id)
+    choices = Choice.objects.all()
     # Get the selected choice ids from the submission record
     selected_choices = submission.choices
+    correct_score = 0
     total_score = 0
-    total_question_weight = 0
     question_array = []
-    question_count = Question.objects.filter(course_id=course_id).count()
+    wrong_score = 0
+    wrong_array = []
     questions = Question.objects.filter(course_id=course_id)
 
-    for choice in selected_choices.all():
-        #select all and see that this logic needs to be fixed
-        if choice.choice_correct:
+    for choice in choices.all():
+        if Question.objects.get(id=choice.question.id) not in question_array and Question.objects.get(id=choice.question.id) not in wrong_array:
             total_score += Question.objects.get(id=choice.question.id).grade_point
-        if Question.objects.get(id=choice.question.id) not in question_array:
-            question_array.append(Question.objects.get(id=choice.question.id))
-            total_question_weight += Question.objects.get(id=choice.question.id).grade_point
+        if choice.choice_correct and choice not in selected_choices.all():
+            if Question.objects.get(id=choice.question.id) not in wrong_array:
+                wrong_score += Question.objects.get(id=choice.question.id).grade_point
+                wrong_array.append(Question.objects.get(id=choice.question.id))
+        elif not choice.choice_correct and choice in selected_choices.all():
+            if Question.objects.get(id=choice.question.id) not in wrong_array:
+                wrong_score += Question.objects.get(id=choice.question.id).grade_point
+                wrong_array.append(Question.objects.get(id=choice.question.id))
+        elif choice.choice_correct and choice in selected_choices.all():
+            if Question.objects.get(id=choice.question.id) not in question_array:
+                question_array.append(Question.objects.get(id=choice.question.id))
+        elif not choice.choice_correct and choice not in selected_choices.all():
+            if Question.objects.get(id=choice.question.id) not in question_array:
+                question_array.append(Question.objects.get(id=choice.question.id))
+
     #logic for the case where no checkbox is selected for a problem
-    unanswered_questions = list(set(questions)-set(question_array))
-    #now find the weights of these questions
-    for question in unanswered_questions:
-        total_question_weight += question.grade_point
     string_score = 0
-    if (total_score*100)/total_question_weight % 1 == 0:
-        string_score = str(int((total_score*100)/total_question_weight))+"/100"
+    if ((total_score-wrong_score)*100)/total_score % 1 == 0:
+        string_score = str(int(((total_score-wrong_score)*100)/total_score))+"/100"
     else:
-        string_score = str((total_score*100)/total_question_weight)+"/100"
+        string_score = str(((total_score-wrong_score)*100)/total_score)+"/100"
     # For each selected choice, check if it is a correct answer or not
     # Calculate the total score
     context = {
         'score':string_score,
         'course': course,
         'selected_choices':selected_choices,
-        'grade':(total_score*100)/total_question_weight,
+        'grade':((total_score-wrong_score)*100)/total_score,
         'submission':submission,
         'questions':questions,
         'username':request.user.username
