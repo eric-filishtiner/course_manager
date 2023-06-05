@@ -111,11 +111,12 @@ def show_exam_result(request, course_id, submission_id):
                 question_array.append(Question.objects.get(id=choice.question.id))
 
     #logic for the case where no checkbox is selected for a problem
-    string_score = 0
-    if ((total_score-wrong_score)*100)/total_score % 1 == 0:
-        string_score = str(int(((total_score-wrong_score)*100)/total_score))+"/100"
-    else:
-        string_score = str(((total_score-wrong_score)*100)/total_score)+"/100"
+    #string_score = 0
+    #if ((total_score-wrong_score)*100)/total_score % 1 == 0:
+    #    string_score = str(int(((total_score-wrong_score)*100)/total_score))+"/100"
+    #else:
+    #    string_score = str(((total_score-wrong_score)*100)/total_score)+"/100"
+    string_score =  str(int(((total_score-wrong_score)*100)/total_score))+"/100"
     # For each selected choice, check if it is a correct answer or not
     # Calculate the total score
     context = {

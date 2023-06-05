@@ -39,7 +39,7 @@
     {% if grade > 80 %}
     <div class="alert alert-success">
        <!--HINT Display passed info -->
-       <p><b>Congratulations, {{ username }}!</b> You have passed with a score of {{ score }}</p> 
+       <p><b>Congratulations, {{ username }}!</b> You have passed the exam and completed the course with score {{ score }}</p> 
     </div>
         {% else %}
         <div class="alert alert-danger">
@@ -59,12 +59,12 @@
                         {% csrf_token %}
                             <div class="form-group">
                                 {% for choice in question.choice_set.all %}
-                                    {% if choice.choice_correct %}
+                                    {% if choice.choice_correct and choice in selected_choices.all %}
                                     <div style="color:#37a745;">
                                         <span style="margin-right: 18px;">{{ variable }}</span>
                                         Correct answer: {{ choice.content }}
                                     </div>
-                                    {% elif choice not in selected_choices.all %}
+                                    {% elif choice.choice_correct and choice not in selected_choices.all %}
                                     <div style="color: #fbc113;">
                                         <span style="margin-right: 18px;">{{ variable }}</span>
                                        Not selected: {{ choice.content }}
