@@ -85,23 +85,32 @@ def show_exam_result(request, course_id, submission_id):
     # Get the selected choice ids from the submission record
     selected_choices = submission.choices
     total_score = 0
-    total_question_weight=0
+    total_question_weight = 0
+    question_array = []
     question_count = Question.objects.filter(course_id=course_id).count()
     questions = Question.objects.filter(course_id=course_id)
 
     for choice in selected_choices.all():
         if choice.choice_correct:
             total_score += Question.objects.get(id=choice.question.id).grade_point
-        total_question_weight += Question.objects.get(id=choice.question.id).grade_point
+        if Question.objects.get(id=choice.question.id) not in question_array:
+            question_array.append(Question.objects.get(id=choice.question.id))
+            total_question_weight += Question.objects.get(id=choice.question.id).grade_point
+    #logic for the case where no checkbox is selected for a problem
+    unanswered_questions = list(set(questions)-set(question_array))
+    #now find the weights of these questions
+    for question in unanswered_questions:
+        total_question_weight += question.grade_point
+
     # For each selected choice, check if it is a correct answer or not
     # Calculate the total score
     context = {
         'score':total_score,
         'course': course,
         'selected_ids':selected_choices,
-        'grade':(total_score/total_question_weight) * 100,
+        'grade':(total_score*100)/total_question_weight,
         'submission':submission,
-        'questions':questions
+        'questions':questions,
     }
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 
