@@ -91,6 +91,7 @@ def show_exam_result(request, course_id, submission_id):
     questions = Question.objects.filter(course_id=course_id)
 
     for choice in selected_choices.all():
+        #select all and see that this logic needs to be fixed
         if choice.choice_correct:
             total_score += Question.objects.get(id=choice.question.id).grade_point
         if Question.objects.get(id=choice.question.id) not in question_array:
@@ -101,16 +102,21 @@ def show_exam_result(request, course_id, submission_id):
     #now find the weights of these questions
     for question in unanswered_questions:
         total_question_weight += question.grade_point
-
+    string_score = 0
+    if (total_score*100)/total_question_weight % 1 == 0:
+        string_score = str(int((total_score*100)/total_question_weight))+"/100"
+    else:
+        string_score = str((total_score*100)/total_question_weight)+"/100"
     # For each selected choice, check if it is a correct answer or not
     # Calculate the total score
     context = {
-        'score':total_score,
+        'score':string_score,
         'course': course,
-        'selected_ids':selected_choices,
+        'selected_choices':selected_choices,
         'grade':(total_score*100)/total_question_weight,
         'submission':submission,
         'questions':questions,
+        'username':request.user.username
     }
     return render(request, 'onlinecourse/exam_result_bootstrap.html', context)
 

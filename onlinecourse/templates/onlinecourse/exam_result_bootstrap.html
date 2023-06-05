@@ -39,12 +39,12 @@
     {% if grade > 80 %}
     <div class="alert alert-success">
        <!--HINT Display passed info -->
-       <p>Congratulations, you have passed with a score of {{ grade }}/100</p> 
+       <p><b>Congratulations, {{ username }}!</b> You have passed with a score of {{ score }}</p> 
     </div>
         {% else %}
         <div class="alert alert-danger">
             <!--HINT Display failed info -->
-            <p>Sorry! You have failed exam with score {{ grade }}/100</p>    
+            <p><b>Failed</b> Sorry, {{ username }}! You have failed exam with score {{ score }}</p>    
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
@@ -59,13 +59,23 @@
                         {% csrf_token %}
                             <div class="form-group">
                                 {% for choice in question.choice_set.all %}
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input type="checkbox" name="choice_{{choice.id}}"
-                                            class="form-check-input" id="{{choice.id}}"
-                                            value="{{choice.id}}">{{ choice.content }}
-                                    </label>
-                                </div>
+                                    {% if choice.choice_correct %}
+                                    <div style="color:#37a745;">
+                                        <span style="margin-right: 18px;">{{ variable }}</span>
+                                        Correct answer: {{ choice.content }}
+                                    </div>
+                                    {% elif choice not in selected_choices.all %}
+                                    <div style="color: #fbc113;">
+                                        <span style="margin-right: 18px;">{{ variable }}</span>
+                                       Not selected: {{ choice.content }}
+                                    </div>
+                                    {% else %}
+                                    <div style="color:black">
+                                        <span style="margin-right: 18px;">{{ variable }}</span>
+                                        {{ choice.content }}
+                                    </div>
+                                    {% endif %}
+
                                 {% endfor %}
                             </div>
                             {% endfor %}
